@@ -24,6 +24,7 @@ export default async function start(webhandle) {
 			await first1.insertOne({ when: new Date(), msg: 'hello' })
 			let objs = await first1.find({msg: 'hello'}).toArray()
 			let found = objs[0]
+			console.log(found._id)
 			assert.equal(found.msg, 'hello', "Message should say hello.")
 
 

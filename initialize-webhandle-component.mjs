@@ -60,7 +60,6 @@ initializeWebhandleComponent.setup = async function (webhandle, config) {
 			})
 
 			log.info("Created connection to mongo database connection: " + dbName)
-			console.log(db)
 		}
 	}
 
