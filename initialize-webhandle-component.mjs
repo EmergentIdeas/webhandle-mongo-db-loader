@@ -24,42 +24,44 @@ initializeWebhandleComponent.setup = async function (webhandle, config) {
 	}
 	let dbs = webhandle.dbs
 
-	for(let current of dbDefs) {
-		if (current.type === 'mongodb') {
-			let db = {
-				dbName: current.dbName,
-				collections: []
-			}
-			let dbName = current.name || current.dbName || 'db' + new Date().getTime() + counter++
-			dbs[dbName] = db
-			db.name = dbName
-			
-			
-			db.client = new MongoClient(current.url)
-			try {
-				await db.client.connect()
-			}
-			catch(e) {
-				log.error("Could not connect to mongo db:" + current.dbName)
-				log.error(err)
-				continue
-			}
-			db.db = db.client.db(db.name)
-			if (current.collectionNames) {
-				for(let currentCollectionName of current.collectionNames) {
-					db.collections[currentCollectionName] = db.db.collection(currentCollectionName)
+	if (dbDefs && Array.isArray(dbDefs)) {
+		for (let current of dbDefs) {
+			if (current.type === 'mongodb') {
+				let db = {
+					dbName: current.dbName,
+					collections: []
 				}
-			}
-			if(!webhandle.primaryDatabase) {
-				webhandle.primaryDatabase = db
-			}
-			
-			webhandle.shutdownFunctions.push(async () => {
-				log.info("Closing connection to mongo database: " + dbName)
-				await db.client.close()
-			})
+				let dbName = current.name || current.dbName || 'db' + new Date().getTime() + counter++
+				dbs[dbName] = db
+				db.name = dbName
 
-			log.info("Created connection to mongo database connection: " + dbName)
+
+				db.client = new MongoClient(current.url)
+				try {
+					await db.client.connect()
+				}
+				catch (e) {
+					log.error("Could not connect to mongo db:" + current.dbName)
+					log.error(err)
+					continue
+				}
+				db.db = db.client.db(db.name)
+				if (current.collectionNames) {
+					for (let currentCollectionName of current.collectionNames) {
+						db.collections[currentCollectionName] = db.db.collection(currentCollectionName)
+					}
+				}
+				if (!webhandle.primaryDatabase) {
+					webhandle.primaryDatabase = db
+				}
+
+				webhandle.shutdownFunctions.push(async () => {
+					log.info("Closing connection to mongo database: " + dbName)
+					await db.client.close()
+				})
+
+				log.info("Created connection to mongo database connection: " + dbName)
+			}
 		}
 	}
 
