@@ -42,7 +42,7 @@ initializeWebhandleComponent.setup = async function (webhandle, config) {
 				}
 				catch (e) {
 					log.error("Could not connect to mongo db:" + current.dbName)
-					log.error(err)
+					log.error(e)
 					continue
 				}
 				db.db = db.client.db(db.name)
